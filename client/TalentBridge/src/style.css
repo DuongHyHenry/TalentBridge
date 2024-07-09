@@ -1,0 +1,64 @@
+.spectral-extralight {
+    font-family: "Spectral", serif;
+    font-weight: 200;
+    font-style: normal;
+}
+
+
+header {
+    color: rgb(0, 0, 0);
+    font-family: 'Spectral';
+    background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
+    font-size: 22px;
+    text-align: center;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between; /* Align items horizontally with space between */
+    align-items: center; /* Vertically center items */
+    gap: 10px;
+    padding-right: 10px; /* Add padding to the right to create a gap */
+    padding-left: 10px;
+}
+
+.headerLinks {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.headerLinks li a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+}
+
+body {
+    margin: 0;
+}
+
+header img {
+    width: 25%;
+}
+
+main img {
+    width: 100%;
+}
+
+footer {
+    color: rgb(255, 255, 255);
+    font-family: 'Spectral';
+    background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
+    font-size: 22px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 20px;
+    text-align: center;
+    margin: 0 auto;
+}
