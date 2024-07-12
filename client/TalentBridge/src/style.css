@@ -1,13 +1,14 @@
-.spectral-extralight {
-    font-family: "Spectral", serif;
-    font-weight: 200;
+@font-face {
+    font-family: 'Gilroy-Regular';
     font-style: normal;
+    font-weight: normal;
+    src: local('Gilroy-Regular'), url('assets/Gilroy-Bold.woff') format('woff');
 }
 
 
 header {
     color: rgb(0, 0, 0);
-    font-family: 'Spectral';
+    font-family: 'Gilroy-Regular';
     background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
     font-size: 22px;
     text-align: center;
@@ -53,7 +54,7 @@ main img {
 
 footer {
     color: rgb(255, 255, 255);
-    font-family: 'Spectral';
+    font-family: 'Gilroy-Regular';
     background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
     font-size: 22px;
     padding-top: 10px;

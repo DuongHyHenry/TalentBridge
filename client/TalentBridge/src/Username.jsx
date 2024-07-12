@@ -1,60 +1,37 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-function Username() {
-    const [username, setUsername] = useState('');
-    const [error, setError] = useState('');
+const Username = () => {
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+  const handleUsernameSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:5000/registerUsername', { username }, { withCredentials: true });
+      navigate('/'); // Redirect to the main screen after successful registration
+    } catch (err) {
+      setError(err.response.data.message || 'Error registering username');
+    }
+  };
 
-        try {
-            // Perform any client-side validation here
-            
-            const response = await fetch('http://localhost:5000/registerUsername', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username }),
-            });
-
-            // Handle response
-            if (response.ok) {
-                // Optionally reset form state after successful submission
-                setUsername('');
-                setError('');
-
-                // Redirect to next step after successful registration
-                // Consider using React Router for navigation within the SPA
-                window.location.href = 'http://localhost:5173/';
-            } else {
-                // Handle error response from server
-                const data = await response.json();
-                setError(data.error || 'Unknown error occurred');
-            }
-        } catch (error) {
-            console.error('Failed to submit form:', error);
-            setError('Error submitting form');
-        }
-    };
-
-    const handleUsernameChange = (event) => {
-        setUsername(event.target.value);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                name="username"
-                placeholder="Pick a username"
-                value={username}
-                onChange={handleUsernameChange}
-            />
-            <button type="submit">Register</button>
-            {error && <p>{error}</p>}
-        </form>
-    );
-}
+  return (
+    <div>
+      <h2>Register Username</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <form onSubmit={handleUsernameSubmit}>
+        <input
+          type="text"
+          placeholder="Enter username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  );
+};
 
 export default Username;

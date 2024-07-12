@@ -1,6 +1,6 @@
 const express = require('express');
-const expressHandlebars = require('express-handlebars');
 const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const passport = require('passport');
@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 const cors = require('cors');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 require('dotenv').config({ path: 'OAuth.env' });
 
 // Configuration and Setup
@@ -16,18 +17,24 @@ const PORT = 5000;
 
 let db;
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Replace with your frontend URL
+    credentials: true,
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const CLIENT_ID_FB = process.env.CLIENT_ID_FB;
+const CLIENT_SECRET_FB = process.env.CLIENT_SECRET_FB;
 
-// SQL Database Connection and Google OAuth
+// SQL Database Connection
 async function startConnection() {
     try {
-        db = await sqlite.open({ 
-            filename: 'databaseFile.db', 
-            driver: sqlite3.Database 
+        db = await sqlite.open({
+            filename: 'databaseFile.db',
+            driver: sqlite3.Database
         });
         console.log("Database connected successfully.");
     } catch (err) {
@@ -44,6 +51,15 @@ passport.use(new GoogleStrategy({
     return done(null, profile);
 }));
 
+passport.use(new FacebookStrategy({
+    clientID: CLIENT_ID_FB,
+    clientSecret: CLIENT_SECRET_FB,
+    callbackURL: `http://localhost:${PORT}/auth/facebook/callback`
+}, (token, tokenSecret, profile, done) => {
+    return done(null, profile);
+}));
+
+
 passport.serializeUser((user, done) => {
     done(null, user);
 });
@@ -52,32 +68,14 @@ passport.deserializeUser((obj, done) => {
     done(null, obj);
 });
 
-app.engine(
-    'handlebars',
-    expressHandlebars.engine({
-        helpers: {
-            toLowerCase: function (str) {
-                return str.toLowerCase();
-            },
-            ifCond: function (v1, v2, options) {
-                if (v1 === v2) {
-                    return options.fn(this);
-                }
-                return options.inverse(this);
-            },
-        },
-    })
-);
-
-app.set('view engine', 'handlebars');
-app.set('views', './views');
-
 app.use(
     session({
+        store: new SQLiteStore(),
         secret: 'ILoveJeanmarieBwemo',
         resave: false,
         saveUninitialized: false,
         cookie: { secure: false },
+        loggedIn: false
     })
 );
 
@@ -93,7 +91,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -112,7 +109,7 @@ app.get('/googleLogout', (req, res) => {
             return res.json({ message: 'Error logging out from Google' });
         }
         req.session.destroy();
-        res.json({ message: 'Logged out from Google' });
+        res.redirect("http://localhost:5173/")
     });
 });
 
@@ -128,6 +125,8 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
         console.log("User Found", userFound);
         if (userFound) {
             req.session.userId = req.user.id;
+            req.session.username = userFound.username;
+            req.session.email = req.user.email;
             req.session.loggedIn = true;
             res.redirect('http://localhost:5173/');
         } else {
@@ -138,39 +137,81 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
         }
     } catch (error) {
         console.log("Could not finish callback:", error);
-        res.redirect('/login');
+        res.redirect('/');
+    }
+});
+
+// Define route for Facebook authentication
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['public_profile'] }));
+
+// Define callback route after Facebook authentication
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), async (req, res) => {
+    try {
+        console.log("User Facebook Id:", req.user.id);
+        let userId = req.user.id;
+        let userFound = await findUserByHashedId(userId);
+        console.log("User Found", userFound);
+        if (userFound) {
+            req.session.userId = req.user.id;
+            req.session.username = userFound.username;
+            req.session.email = req.user.email;
+            req.session.loggedIn = true;
+            res.redirect('http://localhost:5173/');
+        } else {
+            req.session.userId = userId;
+            console.log(req.session.userId);
+            req.session.loggedIn = true;
+            res.redirect('http://localhost:5173/Username');
+        }
+    } catch (error) {
+        console.log("Could not finish callback:", error);
+        res.redirect('/');
+    }
+});
+
+app.get('/userInfo', (req, res) => {
+    if (req.session.loggedIn) {
+        res.json({
+            userId: req.session.userId,
+            username: req.session.username,
+            email: req.session.email
+        });
+    } else {
+        res.status(401).json({ message: 'User not logged in' });
     }
 });
 
 app.get('/api/example', (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
-  
+
 app.get('/registerUsername', (req, res) => {
-    res.render('registerUsername', { usernameError: req.query.error });
+    res.redirect('http://localhost:5173/');
 });
 
 app.post('/registerUsername', async (req, res) => {
     try {
-        console.log("req.body in /registerUsername:", req.body);
         let username = req.body.username;
+        req.session.username = req.body.username;
+        console.log("Username: ", req.session.username);
         let userFound = await findUserByUsername(username);
         if (userFound) {
-            res.redirect('/registerUsername?error=Username%20Already%20Exists');
+            res.redirect('http://localhost:5173/');
         } else {
-            console.log("Google Id:", req.session.userId);
-            let hashedGoogleId = await bcrypt.hash(req.session.userId, 10);
-            console.log("Newly Hashed Id:", hashedGoogleId);
-            let memberSince = await generateTimeStamp();
+            console.log("User Not Found. Google Id:", req.session.userId);
+            let hashedId = await bcrypt.hash(req.session.userId, 10);
+            console.log("Newly Hashed Id:", hashedId);
+            let memberSince = new Date().toDateString();
             await db.run(
-                'INSERT INTO users (username, hashedGoogleId, memberSince) VALUES (?, ?, ?)',
-                [username, hashedGoogleId, memberSince]
+                'INSERT INTO users (username, hashedId, memberSince) VALUES (?, ?, ?)',
+                [username, hashedId, memberSince]
             );
+            await showDatabaseContents();
             res.redirect('http://localhost:5173/');
         }
     } catch (error) {
         console.log("Could not register username:", error);
-        res.redirect('http://localhost:5173/Username?error=Error%20registering%20username');
+        res.redirect('http://localhost:5173/');
     }
 });
 
@@ -180,7 +221,7 @@ async function findUserByHashedId(userId) {
         const rows = await db.all(query);
         userIdString = String(userId);
         for (const row of rows) {
-            const isMatch = await bcrypt.compare(userIdString, row.hashedGoogleId);
+            const isMatch = await bcrypt.compare(userIdString, row.hashedId);
             if (isMatch) {
                 return row;
             }
@@ -226,3 +267,40 @@ startConnection().then(() => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
 });
+
+
+async function showDatabaseContents() {
+
+    // Check if the users table exists
+    const usersTableExists = await db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`);
+    if (usersTableExists) {
+        console.log('Users table exists.');
+        const users = await db.all('SELECT * FROM users');
+        if (users.length > 0) {
+            console.log('Users:');
+            users.forEach(user => {
+                console.log(user);
+            });
+        } else {
+            console.log('No users found.');
+        }
+    } else {
+        console.log('Users table does not exist.');
+    }
+}
+
+async function generateTimeStamp() {
+    try {
+        const currentTime = new Date();
+        const year = twoDigits(currentTime.getFullYear());
+        const month = twoDigits(currentTime.getMonth());
+        const day = twoDigits(currentTime.getDate());
+        const hours = twoDigits(currentTime.getHours());
+        const minutes = twoDigits(currentTime.getMinutes());
+        const timestamp = `${year}-${month}-${day} ${hours}:${minutes}`;
+        return timestamp;
+    } catch(error) {
+        console.log("Could not generate TimeStamp", error);
+    }
+    
+}

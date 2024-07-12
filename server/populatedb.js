@@ -10,7 +10,7 @@ async function initializeDB() {
     await db.exec(`
         CREATE TABLE IF NOT EXISTS users (
             username TEXT NOT NULL UNIQUE,
-            hashedGoogleId TEXT NOT NULL UNIQUE,
+            hashedId TEXT NOT NULL UNIQUE,
             memberSince DATETIME NOT NULL
         );
     `);    

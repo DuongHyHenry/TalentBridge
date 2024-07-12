@@ -1,31 +1,38 @@
-// src/Home.jsx
-import React from 'react';
-import { Link, Route, Routes } from 'react-router-dom'; // Import Route and Routes
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import AuthContext from './AuthContext';
 import Orca from './assets/orca.jpg';
-import Logo from './assets/logo2.png'
-import Login from './Login'; // Import Login component
+import Logo from './assets/logo2.png';
 import "./style.css";
 
-function Home() {
+const Home = () => {
+  const { user } = useContext(AuthContext);
+
   return (
     <>
       <header>
         <div className="header">
-        <img src={Logo} alt="Logo" />
+          <img src={Logo} alt="Logo" />
           <ul className="headerLinks">
             <li>
-              <Link to="/">Home</Link> {/* Use Link for internal navigation */}
+              <Link to="/">Home</Link>
             </li>
             <li>
-              <a href="http://localhost:5000/auth/google">Login/Register</a>            
+              {user ? (
+                <span>Welcome, {user.username}</span>
+              ) : (
+                <Link to="/Login">Login/Register</Link>
+              )}
+            </li>
+            <li>
+              {user ? (
+                <Link to="/Logout">Logout</Link>
+              ) : null}
             </li>
           </ul>
         </div>
       </header>
       <main>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-        </Routes>
         <img src={Orca} alt="My Photo" />
       </main>
       <footer>
@@ -33,6 +40,6 @@ function Home() {
       </footer>
     </>
   );
-}
+};
 
 export default Home;
