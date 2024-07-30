@@ -13,6 +13,7 @@ async function initializeDB() {
   await db.exec(`
         DROP TABLE IF EXISTS solvedProblems;
         DROP TABLE IF EXISTS users;
+        DROP TABLE IF EXISTS companies;
         DROP TABLE IF EXISTS problems;
     `);
 
@@ -29,10 +30,20 @@ async function initializeDB() {
   await db.exec(`
         CREATE TABLE IF NOT EXISTS problems (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            companyID INTEGER NOT NULL,
             company TEXT NOT NULL,
             problemID TEXT NOT NULL UNIQUE,
             timesSolved INTEGER NOT NULL,
-            difficulty INTEGER NOT NULL
+            difficulty INTEGER NOT NULL,
+            FOREIGN KEY (companyID) REFERENCES companies(ID)
+        );
+    `);
+
+  await db.exec(`
+        CREATE TABLE IF NOT EXISTS companies (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            companyName TEXT NOT NULL,
+            companyLogo TEXT
         );
     `);
 
@@ -46,6 +57,21 @@ async function initializeDB() {
             FOREIGN KEY (problemID) REFERENCES problems(ID)
         );
     `);
+
+  const companies = [
+    { companyName: 'Hi-Rez Studios', companyLogo: '/src/assets/game-logo.png' },
+    { companyName: 'Smart Lab', companyLogo: 'src/assets/logoSmall2.png' },
+    { companyName: 'Marine Conseration Company', companyLogo: '/src/assets/orca.jpg' },
+    { companyName: 'Marine Conseration Company', companyLogo: '/src/assets/orca.jpg' },
+    { companyName: 'Marine Conseration Company', companyLogo: '/src/assets/orca.jpg' }
+  ];
+
+  await Promise.all(companies.map(company => {
+    return db.run(
+        'INSERT INTO companies (companyName, companyLogo) VALUES (?, ?)',
+        [company.companyName, company.companyLogo]
+    );
+  }));
 
   console.log("Database initialized successfully");
 }

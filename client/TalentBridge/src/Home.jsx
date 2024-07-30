@@ -1,64 +1,89 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { Timeline } from "antd";
-import AuthContext from './AuthContext';
-import { Tooltip } from 'antd';
-import { Table } from "antd";
-import Orca from './assets/orca.jpg';
-import Logo from './assets/logo2.png';
+import React, { useContext, useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
+import { Tooltip } from "antd";
+import { Card } from "antd";
+import Header from "./Header";
+import LeftArrow from "./assets/LeftArrow.png";
+import RightArrow from "./assets/RightArrow.png";
 import "./style.css";
 
 const Home = () => {
-  const { user } = useContext(AuthContext);
+  const [data, setData] = useState([]);
+  const scrollRef = useRef(null); // Create a ref for the scrollable section
+
+  useEffect(() => {
+    fetch("http://localhost:5000/companies")
+      .then((response) => response.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error("Error fetching company data:", error));
+  }, []);
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -220, behavior: "smooth" }); // Scroll left by the width of a card
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 220, behavior: "smooth" }); // Scroll right by the width of a card
+    }
+  };
 
   return (
     <>
-      <header>
-        <div className="header">
-          <img src={Logo} alt="Logo" />
-          <ul className="headerLinks">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              {user ? (
-                <span>Welcome, {user.username}</span>
-              ) : (
-                <Link to="/Login">Login/Register</Link>
-              )}
-            </li>
-            <li>
-              {user ? (
-                <Link to="/Logout">Logout</Link>
-              ) : null}
-            </li>
-          </ul>
+      <Header />
+      <div className="main-body">
+        <div className="scrollable-section" ref={scrollRef}>
+          <div className="card-container">
+            {data.map((item) => (
+              <Link
+                to={`/company/${item.ID}`}
+                key={item.ID}
+                className="card-link"
+              >
+                <Card className="custom-card">
+                  <div className="card-title">{item.companyName}</div>
+                  <img
+                    src={item.companyLogo}
+                    alt={item.companyName}
+                    className="card-image"
+                  />
+                </Card>
+              </Link>
+            ))}
+          </div>
         </div>
-      </header>
-      <main>
-        <Timeline
-          items={[
-            {
-              children: 'Create a services site 2015-09-01',
-            },
-            {
-              children: 'Solve initial network problems 2015-09-01',
-            },
-            {
-              children: 'Technical testing 2015-09-01',
-            },
-            {
-              children: 'Network problems being solved 2015-09-01',
-            },
-          ]}
-        />
+        <div className="scroll-button-left" onClick={scrollLeft}>
+            <img src={LeftArrow} alt="Scroll Right" />
+        </div>
+        <div className="scroll-button-right" onClick={scrollRight}>
+          <img src={RightArrow} alt="Scroll Right" />
+        </div>
+        
+
         <Tooltip title="prompt text">
           <span>Tooltip will show on mouse enter.</span>
         </Tooltip>
-      </main>
-      <footer>
-        @2024 SmartLab. All Rights Reserved.
-      </footer>
+        <br/>
+        <br/>
+
+        <br/>
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+      </div>
+      <footer>@2024 SmartLab. All Rights Reserved.</footer>
     </>
   );
 };

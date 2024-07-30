@@ -19,7 +19,7 @@ let db;
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Replace with your frontend URL
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -124,13 +124,13 @@ app.get("/googleLogout", (req, res) => {
   });
 });
 
-// Define route for Google authentication
+// Route for Google authentication
 app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-// Define callback route after Google authentication
+// Callback route after Google authentication
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
@@ -159,13 +159,13 @@ app.get(
   }
 );
 
-// Define route for Facebook authentication
+// Route for Facebook authentication
 app.get(
   "/auth/facebook",
   passport.authenticate("facebook", { scope: ["public_profile"] })
 );
 
-// Define callback route after Facebook authentication
+// Callback route after Facebook authentication
 app.get(
   "/auth/facebook/callback",
   passport.authenticate("facebook", { failureRedirect: "/login" }),
@@ -194,6 +194,7 @@ app.get(
   }
 );
 
+// Route to get user's info
 app.get("/userInfo", (req, res) => {
   if (req.session.loggedIn) {
     res.json({
@@ -206,14 +207,12 @@ app.get("/userInfo", (req, res) => {
   }
 });
 
-app.get("/api/example", (req, res) => {
-  res.json({ message: "Hello from the backend!" });
-});
-
+// Route to redirect to homepage after registering username
 app.get("/registerUsername", (req, res) => {
   res.redirect("http://localhost:5173/");
 });
 
+// Route to choose username after registering
 app.post("/registerUsername", async (req, res) => {
   try {
     let username = req.body.username;
@@ -240,6 +239,28 @@ app.post("/registerUsername", async (req, res) => {
   }
 });
 
+app.get("/companies", async (req, res) => {
+  try {
+    const companies = await getCompanies();
+    res.json(companies)
+  }
+  catch (error) {
+    console.log("Failed to return companies: ", error);
+  }
+    
+});
+
+async function getCompanies() {
+  try {
+    const companies = await db.all('SELECT * FROM companies');
+    return companies;
+  }
+  catch (error) {
+    console.log("Failed to fetch companies: ", error);
+  }
+}
+
+// Function to display problems from company
 async function displayProblems(problemIDs) {
   try {
     let currentProblem = 0;
@@ -260,8 +281,10 @@ async function displayProblems(problemIDs) {
   }
 }
 
+// Function to help company add problems of their own to the website
 async function addProblem() {}
 
+// Function that tracks that a problem is solved by the user
 async function problemSolved(userID, problemID) {
   try {
     let solvedAt = new Date().toDateString();
@@ -282,6 +305,7 @@ async function problemSolved(userID, problemID) {
   }
 }
 
+// Function that finds a user by their hashed ID
 async function findUserByHashedID(userID) {
   const query = "SELECT * FROM users";
   try {
@@ -299,6 +323,7 @@ async function findUserByHashedID(userID) {
   }
 }
 
+// Function that finds a user by their username
 async function findUserByUsername(username) {
   const query = "SELECT * FROM users WHERE username = ?";
 
@@ -315,6 +340,7 @@ async function findUserByUsername(username) {
   }
 }
 
+// Funtion that finds a problem by its ID
 async function findProblemByID(problemID) {
   const query = "SELECT * FROM problems WHERE problemID = ?";
 
@@ -331,6 +357,7 @@ async function findProblemByID(problemID) {
   }
 }
 
+// Function that finds all problems by a company
 async function findProblemByCompany(company) {
   const query = "SELECT * FROM problems WHERE company = ?";
 
@@ -347,6 +374,7 @@ async function findProblemByCompany(company) {
   }
 }
 
+// Function that finds problems by difficulty
 async function findProblemByDifficulty(difficulty) {
   const query = "SELECT * FROM problems WHERE difficulty = ?";
 
@@ -363,6 +391,7 @@ async function findProblemByDifficulty(difficulty) {
   }
 }
 
+// Function that connects to the SQLite databse
 async function startConnection() {
   try {
     db = await sqlite.open({
@@ -376,12 +405,14 @@ async function startConnection() {
   }
 }
 
+// Listens for connection then informs the user in console log
 startConnection().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
 });
 
+// Function to test if database is correct by printing it out
 async function showDatabaseContents() {
   // Check if the users table exists
   const usersTableExists = await db.get(
@@ -400,6 +431,24 @@ async function showDatabaseContents() {
     }
   } else {
     console.log("Users table does not exist.");
+  }
+  
+  const companiesTableExists = await db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='companies';`
+  );
+  if (companiesTableExists) {
+    console.log("Companies table exists.");
+    const companies = await db.all("SELECT * FROM companies");
+    if (companies.length > 0) {
+      console.log("Companies:");
+      companies.forEach((company) => {
+        console.log(company);
+      });
+    } else {
+      console.log("No companies found.");
+    }
+  } else {
+    console.log("Companies table does not exist.");
   }
 
   const problemsTableExists = await db.get(
@@ -436,20 +485,5 @@ async function showDatabaseContents() {
     }
   } else {
     console.log("Problems solved table does not exist.");
-  }
-}
-
-async function generateTimeStamp() {
-  try {
-    const currentTime = new Date();
-    const year = twoDigits(currentTime.getFullYear());
-    const month = twoDigits(currentTime.getMonth());
-    const day = twoDigits(currentTime.getDate());
-    const hours = twoDigits(currentTime.getHours());
-    const minutes = twoDigits(currentTime.getMinutes());
-    const timestamp = `${year}-${month}-${day} ${hours}:${minutes}`;
-    return timestamp;
-  } catch (error) {
-    console.log("Could not generate TimeStamp", error);
   }
 }
