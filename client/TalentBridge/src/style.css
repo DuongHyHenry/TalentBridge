@@ -1,20 +1,33 @@
 @font-face {
+    font-family: 'Gilroy-Bold';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Gilroy-Bold'), url('assets/Gilroy-Bold.woff') format('woff');
+}
+
+@font-face {
     font-family: 'Gilroy-Regular';
     font-style: normal;
     font-weight: normal;
-    src: local('Gilroy-Regular'), url('assets/Gilroy-Bold.woff') format('woff');
+    src: local('Gilroy-Regular'), url('assets/Gilroy-Regular.woff') format('woff');
 }
 
 
 header {
     color: rgb(0, 0, 0);
-    font-family: 'Gilroy-Regular';
+    font-family: 'Gilroy-Bold';
+    
     background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
+    background: rgb(246, 246, 246);
     font-size: 22px;
     text-align: center;
     width: 100%;
     padding-top: 10px;
     padding-bottom: 10px;
+    position: fixed;
+    top: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 }
 
 .header {
@@ -37,7 +50,7 @@ header {
 
 .headerLinks li a {
     text-decoration: none;
-    color: #ffffff;
+    color: #000000;
     transition: transform 0.2s ease, color 0.2s ease;
     display: inline-block;
     padding: 6px 6px;
@@ -45,26 +58,53 @@ header {
 
 .headerLinks li a:hover {
     transform: scale(1.1);
-    color: #403758;
+    color: #554580;
 }
 
 .main-body {
     margin: 0;
-    background: #746bc0;
+    background: rgb(246, 246, 246);
     font-family: 'Gilroy-Regular';
-    color: white;
+    color: rgb(0, 0, 0);
+    padding-top: 120px;
 }
+
+.main-body h1 {
+    font-family: "Gilroy-Bold";
+    color: #645DA5;
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.main-info {
+    text-align: center;
+    background:  #8177d5;
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    
+}
+
+.main-info h1 {
+    color: black;
+}
+
+.main-info h1 {
+    font-family: 'Gilroy-Bold';
+}
+
 
 body {
     margin: 0;
     background: #746bc0;
-    font-family: 'Gilroy-Regular';
+    font-family: 'Gilroy-Bold';
     color: white;
 }
 
 
 header img {
-    width: 25%;
+    width: 20%;
 }
 
 .main-body img {
@@ -73,7 +113,7 @@ header img {
 
 footer {
     color: rgb(255, 255, 255);
-    font-family: 'Gilroy-Regular';
+    font-family: 'Gilroy-Bold';
     background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
     font-size: 22px;
     padding-top: 10px;
@@ -87,13 +127,16 @@ footer {
     overflow-x: hidden;
     white-space: nowrap;
     padding: 16px;
-    background-color: #4f4980;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
 }
 
 .card-container {
-    display: flex;
-    flex-wrap: nowrap;
+    display: flex; /* Use flexbox for horizontal layout */
+    flex-wrap: nowrap; /* Prevent wrapping of items */
     align-items: flex-start; /* Align items at the start */
+    gap: 20px;
 }
 
 .card-link {
@@ -103,18 +146,27 @@ footer {
 
 .custom-card {
     width: auto;
-    min-width: 220px;
+    min-width: 400px;
     min-height: 300px; /* Set a minimum height if needed */
     display: flex; /* Change to flex to stack content */
-    flex-direction: column; /* Stack title and image */
-    justify-content: center; /* Center content */
-    align-items: center; /* Center content */
+    flex-direction: row; /* Set to row to align img-title and desc horizontally */
+    justify-content: flex-start; /* Align items at the start */
+    align-items: center; /* Center items vertically */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px; 
     transition: transform 0.2s; 
     padding: 16px;
     box-sizing: border-box;
-    background-color: #7d74c0;
+    background-color: #ffffff;
+}
+
+.card-imgtitle-container {
+    display: flex;
+    flex-direction: column; /* Stack title and image */
+    justify-content: center; /* Center content */
+    align-items: center; /* Center content */
+    gap: 10px;
+    margin-right: 10px; /* Space between the image-title and description */
 }
 
 .custom-card:hover {
@@ -126,7 +178,7 @@ footer {
     font-weight: bold;
     text-align: center;
     margin-bottom: 8px;
-    color: #ffffff;
+    color: #000000;
 }
 
 .card-image {
@@ -139,20 +191,85 @@ footer {
     margin: 0 auto;
 }
 
+.card-difficulty {
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #000000;
+}
+
+.card-desc {
+    width: 100%; /* Adjust the width as needed */
+    font-family: 'Gilroy-Regular';
+    color: rgb(0, 0, 0);
+    padding-top: 10px;
+    white-space: pre-wrap; /* Ensures the text wraps to a new line */
+    text-align: left; /* Align text to the left */
+}
+
+
 .scroll-button-left  {
     left: 10px;
-    top: 40%;
+    top: 100%;
     width: 50px;
     position: absolute;
 }
 
 .scroll-button-right  {
     right: 10px;
-    top: 40%;
+    top: 100%;
     width: 50px;
     position: absolute;
 }
 
 .scroll-button:hover {
     background-color: #5b4e8a; /* Darker shade on hover */
+}
+
+.login-container {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center; /* Align items at the start */
+    justify-content: center; /* Centers horizontally */
+    padding-bottom: 30px;
+    gap: 20px;
+}
+
+.login-card {
+    width: auto;
+    min-width: 220px;
+    min-height: 300px; /* Set a minimum height if needed */
+    display: flex; /* Change to flex to stack content */
+    flex-direction: column; /* Stack title and image */
+    justify-content: center; /* Center content */
+    align-items: center; /* Center content */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px; 
+    transition: transform 0.2s; 
+    padding: 16px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+}
+
+.login-card:hover {
+    transform: scale(1.05);
+}
+
+.hexagon {
+    width: 300px;
+    height: 360px;
+    background-color: #645DA5;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; /* Use flexbox to center the text */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    color: white; /* Text color */
+    font-size: 20px; /* Text size */
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    gap: 20px;
 }

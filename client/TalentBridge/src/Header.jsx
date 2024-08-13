@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import Logo from "./assets/logo2.png";
+import Logo from "./assets/logo.png";
 import AuthContext from "./AuthContext";
 import "./style.css";
 
@@ -17,7 +17,7 @@ function Header() {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/AboutUs">About Us</Link>
+              <a href="https://smartlab.co.tz/about-us" target="_blank" rel="noopener noreferrer">About Us</a>
             </li>
             <li>
               {user ? (

@@ -13,7 +13,6 @@ async function showDatabaseContents() {
 
   console.log('Opening database file:', dbFileName);
 
-
   // Check if the users table exists
   const usersTableExists = await db.get(
     `SELECT name FROM sqlite_master WHERE type='table' AND name='users';`
@@ -51,42 +50,65 @@ async function showDatabaseContents() {
     console.log("Companies table does not exist.");
   }
 
-
-  const problemsTableExists = await db.get(
-    `SELECT name FROM sqlite_master WHERE type='table' AND name='problems';`
+  const descTableExists = await db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='descriptions';`
   );
-  if (problemsTableExists) {
-    console.log("Problems table exists.");
-    const problems = await db.all("SELECT * FROM problems");
-    if (problems.length > 0) {
-      console.log("Problems:");
-      problems.forEach((problem) => {
-        console.log(problem);
+  if (descTableExists) {
+    const desc = await db.all("SELECT * FROM descriptions");
+    if (desc.length > 0) {
+      console.log("Descriptions:");
+      desc.forEach((desc) => {
+        console.log(desc);
       });
     } else {
-      console.log("No problems found.");
+      console.log("No descriptions.");
     }
   } else {
-    console.log("Problems table does not exist.");
+    console.log("Descriptions table does not exist.");
   }
-
-  const problemsSolvedTableExists = await db.get(
-    `SELECT name FROM sqlite_master WHERE type='table' AND name='problemsSolved';`
+  const tasksTableExists = await db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='tasks';`
   );
-  if (problemsSolvedTableExists) {
-    console.log("Problems table exists.");
-    const problemsSolved = await db.all("SELECT * FROM problemsSolved");
-    if (problemsSolved.length > 0) {
-      console.log("Problems:");
-      problemsSolved.forEach((problemSolved) => {
-        console.log(problemSolved);
+  if (tasksTableExists) {
+    console.log("Tasks table exists.");
+    const tasks = await db.all("SELECT * FROM tasks");
+    if (tasks.length > 0) {
+      console.log("Tasks:");
+      tasks.forEach((task) => {
+        console.log(task);
       });
     } else {
-      console.log("No problems solved.");
+      console.log("No tasks found.");
     }
   } else {
-    console.log("Problems solved table does not exist.");
+    console.log("Tasks table does not exist.");
   }
+
+  const taskDescTableExists = await db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='taskDescriptions';`
+  );
+  if (taskDescTableExists) {
+    console.log("Task description table exists.")
+  }
+
+  const tasksSolvedTableExists = await db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='solvedTasks';`
+  );
+  if (tasksSolvedTableExists) {
+    console.log("Solved tasks table exists.");
+    const tasksSolved = await db.all("SELECT * FROM solvedTasks");
+    if (tasksSolved.length > 0) {
+      console.log("Solved tasks:");
+      tasksSolved.forEach((taskSolved) => {
+        console.log(taskSolved);
+      });
+    } else {
+      console.log("No tasks solved.");
+    }
+  } else {
+    console.log("Solved tasks table does not exist.");
+  }
+  
   await db.close();
 }
 

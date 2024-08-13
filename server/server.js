@@ -227,7 +227,7 @@ app.post("/registerUsername", async (req, res) => {
       console.log("Newly Hashed ID:", hashedID);
       let memberSince = new Date().toDateString();
       await db.run(
-        "INSERT INTO users (username, hashedID, problemsSolved, memberSince) VALUES (?, ?, ?, ?)",
+        "INSERT INTO users (username, hashedID, tasksSolved, memberSince) VALUES (?, ?, ?, ?)",
         [username, hashedID, 0, memberSince]
       );
       await showDatabaseContents();
@@ -242,63 +242,132 @@ app.post("/registerUsername", async (req, res) => {
 app.get("/companies", async (req, res) => {
   try {
     const companies = await getCompanies();
-    res.json(companies)
-  }
-  catch (error) {
+    res.json(companies);
+  } catch (error) {
     console.log("Failed to return companies: ", error);
   }
-    
+});
+
+app.get("/companies/:companyName", async (req, res) => {
+  const { companyName } = req.params;
+
+  try {
+    // Fetch company data
+    const company = await getCompanyByName(companyName);
+
+    if (!company) {
+      return res.status(404).send("Company not found");
+    }
+
+    // Fetch descriptions based on the company ID
+    const descriptions = await getCompanyDescription(company.name);
+
+    const tasks = await getTasksByCompany(company.name);
+
+    // Combine company data with descriptions
+    const companyData = {
+      ID: company.ID,
+      name: company.name,
+      logo: company.logo,
+      title: company.title,
+      subtitle: company.subtitle,
+      tags: company.tags,
+      URL: company.URL,
+      descriptions,
+      tasks
+    };
+
+    res.json(companyData);
+  } catch (error) {
+    console.error("Error fetching company data and descriptions:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 async function getCompanies() {
   try {
-    const companies = await db.all('SELECT * FROM companies');
+    const companies = await db.all("SELECT * FROM companies");
     return companies;
-  }
-  catch (error) {
+  } catch (error) {
     console.log("Failed to fetch companies: ", error);
   }
 }
 
-// Function to display problems from company
-async function displayProblems(problemIDs) {
+async function getCompanyByName(name) {
   try {
-    let currentProblem = 0;
-    let finalProblems = [];
-
-    while (problemIDs.length > currentProblem) {
-      let problemRow = await db.get(`SELECT * FROM problems WHERE ID = ?`, [
-        problemIDs[currentProblem],
-      ]);
-      if (problemRow) {
-        finalProblems.push(problemRow);
-      }
-      currentProblem++;
-    }
-    console.log(finalProblems);
+    const company = await db.get(
+      "SELECT * FROM companies WHERE name = ?",
+      name
+    );
+    return company;
   } catch (error) {
-    console.log("Could not display problems:", error);
+    console.log("Failed to fetch company by name: ", error);
   }
 }
 
-// Function to help company add problems of their own to the website
-async function addProblem() {}
+async function getCompanyDescription(name) {
+  try {
+    const description = await db.get(
+      "SELECT * FROM descriptions WHERE company = ?",
+      name
+    );
+    return description;
+  } catch (error) {
+    console.log("Failed to fetch company description by name: ", error);
+  }
+}
 
-// Function that tracks that a problem is solved by the user
-async function problemSolved(userID, problemID) {
+async function getTasksByCompany(name) {
+  try {
+    const tasks = await db.get(
+      "SELECT * FROM tasks WHERE company = ?",
+      name
+    );
+    return tasks;
+  } catch (error) {
+    console.log("Failed to fetch company tasks by name: ", error);
+  }
+}
+
+// Function to display tasks from company
+async function displayTasks(taskIDs) {
+  try {
+    let currenttask = 0;
+    let finaltasks = [];
+
+    while (taskIDs.length > currenttask) {
+      let taskRow = await db.get(`SELECT * FROM tasks WHERE ID = ?`, [
+        taskIDs[currenttask],
+      ]);
+      if (taskRow) {
+        finaltasks.push(taskRow);
+      }
+      currenttask++;
+    }
+    console.log(finaltasks);
+  } catch (error) {
+    console.log("Could not display tasks:", error);
+  }
+}
+
+// Function to help company add tasks of their own to the website
+async function addtask() {}
+
+// Function that tracks that a task is solved by the user
+async function taskSolved(userID, taskID) {
   try {
     let solvedAt = new Date().toDateString();
     await db.run(
-      "INSERT INTO solvedProblems (userID, problemID, solvedAt) VALUES (?, ?, ?)",
-      [userID, problemID, solvedAt]
+      "INSERT INTO solvedtasks (userID, taskID, solvedAt) VALUES (?, ?, ?)",
+      [userID, taskID, solvedAt]
     );
     await db.run(
-      "UPDATE users SET problemsSolved = problemsSolved + 1 WHERE id = ?",
+      "UPDATE users SET tasksSolved = tasksSolved + 1 WHERE id = ?",
       [userID]
     );
     await db.run(
-      "UPDATE problems SET timesSolved = timesSolved + 1 WHERE id = ?",
-      [problemID]
+      "UPDATE tasks SET timesSolved = timesSolved + 1 WHERE id = ?",
+      [taskID]
     );
   } catch (error) {
     console.log("Error executing query:", error);
@@ -340,12 +409,12 @@ async function findUserByUsername(username) {
   }
 }
 
-// Funtion that finds a problem by its ID
-async function findProblemByID(problemID) {
-  const query = "SELECT * FROM problems WHERE problemID = ?";
+// Funtion that finds a task by its ID
+async function findtaskByID(taskID) {
+  const query = "SELECT * FROM tasks WHERE taskID = ?";
 
   try {
-    const row = await db.get(query, [problemID]);
+    const row = await db.get(query, [taskID]);
     if (row) {
       console.log(row);
       return row;
@@ -357,15 +426,15 @@ async function findProblemByID(problemID) {
   }
 }
 
-// Function that finds all problems by a company
-async function findProblemByCompany(company) {
-  const query = "SELECT * FROM problems WHERE company = ?";
+// Function that finds all tasks by a company
+async function findtaskByCompany(company) {
+  const query = "SELECT * FROM tasks WHERE company = ?";
 
   try {
-    const companyProblems = await db.get(query, [company]);
-    if (companyProblems) {
-      console.log(companyProblems);
-      return companyProblems;
+    const companytasks = await db.get(query, [company]);
+    if (companytasks) {
+      console.log(companytasks);
+      return companytasks;
     } else {
       return null;
     }
@@ -374,15 +443,15 @@ async function findProblemByCompany(company) {
   }
 }
 
-// Function that finds problems by difficulty
-async function findProblemByDifficulty(difficulty) {
-  const query = "SELECT * FROM problems WHERE difficulty = ?";
+// Function that finds tasks by difficulty
+async function findtaskByDifficulty(difficulty) {
+  const query = "SELECT * FROM tasks WHERE difficulty = ?";
 
   try {
-    const difficultyProblems = await db.get(query, [difficulty]);
-    if (difficultyProblems) {
-      console.log(difficultyProblems);
-      return difficultyProblems;
+    const difficultytasks = await db.get(query, [difficulty]);
+    if (difficultytasks) {
+      console.log(difficultytasks);
+      return difficultytasks;
     } else {
       return null;
     }
@@ -432,7 +501,7 @@ async function showDatabaseContents() {
   } else {
     console.log("Users table does not exist.");
   }
-  
+
   const companiesTableExists = await db.get(
     `SELECT name FROM sqlite_master WHERE type='table' AND name='companies';`
   );
@@ -451,39 +520,39 @@ async function showDatabaseContents() {
     console.log("Companies table does not exist.");
   }
 
-  const problemsTableExists = await db.get(
-    `SELECT name FROM sqlite_master WHERE type='table' AND name='problems';`
+  const tasksTableExists = await db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='tasks';`
   );
-  if (problemsTableExists) {
-    console.log("Problems table exists.");
-    const problems = await db.all("SELECT * FROM problems");
-    if (problems.length > 0) {
-      console.log("Problems:");
-      problems.forEach((problem) => {
-        console.log(problem);
+  if (tasksTableExists) {
+    console.log("tasks table exists.");
+    const tasks = await db.all("SELECT * FROM tasks");
+    if (tasks.length > 0) {
+      console.log("tasks:");
+      tasks.forEach((task) => {
+        console.log(task);
       });
     } else {
-      console.log("No problems found.");
+      console.log("No tasks found.");
     }
   } else {
-    console.log("Problems table does not exist.");
+    console.log("tasks table does not exist.");
   }
 
-  const problemsSolvedTableExists = await db.get(
-    `SELECT name FROM sqlite_master WHERE type='table' AND name='problemsSolved';`
+  const tasksSolvedTableExists = await db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='tasksSolved';`
   );
-  if (problemsSolvedTableExists) {
-    console.log("Problems table exists.");
-    const problemsSolved = await db.all("SELECT * FROM problemsSolved");
-    if (problemsSolved.length > 0) {
-      console.log("Problems:");
-      problemsSolved.forEach((problemSolved) => {
-        console.log(problemSolved);
+  if (tasksSolvedTableExists) {
+    console.log("tasks table exists.");
+    const tasksSolved = await db.all("SELECT * FROM tasksSolved");
+    if (tasksSolved.length > 0) {
+      console.log("tasks:");
+      tasksSolved.forEach((taskSolved) => {
+        console.log(taskSolved);
       });
     } else {
-      console.log("No problems solved.");
+      console.log("No tasks solved.");
     }
   } else {
-    console.log("Problems solved table does not exist.");
+    console.log("tasks solved table does not exist.");
   }
 }
