@@ -21,7 +21,7 @@ async function initializeDB() {
 
   await db.exec(`
         CREATE TABLE IF NOT EXISTS users (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID INTEGER PRIMARY KEY,
             username TEXT NOT NULL UNIQUE,
             hashedID TEXT NOT NULL UNIQUE,
             tasksSolved INT NOT NULL,
@@ -31,7 +31,7 @@ async function initializeDB() {
 
   await db.exec(`
       CREATE TABLE IF NOT EXISTS companies (
-          ID INTEGER PRIMARY KEY AUTOINCREMENT,
+          ID INTEGER PRIMARY KEY,
           name TEXT NOT NULL,
           logo TEXT,
           title TEXT,
@@ -43,7 +43,7 @@ async function initializeDB() {
 
   await db.exec(`
         CREATE TABLE IF NOT EXISTS descriptions (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID INTEGER PRIMARY KEY,
             companyID INTEGER,
             company TEXT,
             bulletPoint INTEGER,
@@ -56,8 +56,9 @@ async function initializeDB() {
 
   await db.exec(`
         CREATE TABLE IF NOT EXISTS tasks (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID INTEGER PRIMARY KEY,
             companyID INTEGER NOT NULL,
+            name TEXT,
             company TEXT NOT NULL,
             title TEXT,
             subtitle TEXT,
@@ -69,14 +70,14 @@ async function initializeDB() {
 
   await db.exec(`
       CREATE TABLE IF NOT EXISTS taskDescriptions (
-          ID INTEGER PRIMARY KEY AUTOINCREMENT,
+          ID INTEGER PRIMARY KEY,
           taskID INTEGER,
           task TEXT,
           bulletPoint INTEGER,
           content TEXT,
           section INTEGER,
           FOREIGN KEY (taskID) REFERENCES tasks(ID),
-          FOREIGN KEY (task) REFERENCES tasks(name)
+          FOREIGN KEY (task) REFERENCES tasks(title)
       );
   `);
 
@@ -146,348 +147,398 @@ async function initializeDB() {
   // Insert data into the descriptions table
   const descriptions = [
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 0,
-      content: "Gain hands-on experience in client interactions and project execution with Smartcodes. Enhance your skills through practical tasks designed to build your confidence in account management.",
-      section: 1
+      "ID": 1,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 0,
+      "content": "Gain hands-on experience in client interactions and project execution with Smartcodes. Enhance your skills through practical tasks designed to build your confidence in account management.",
+      "section": 1
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Self-paced 4-5 hours",
-      section: 1
+      "ID": 2,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Self-paced 4-5 hours",
+      "section": 1
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "No grades",
-      section: 1
+      "ID": 3,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "No grades",
+      "section": 1
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "No assessments",
-      section: 1
+      "ID": 4,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "No assessments",
+      "section": 1
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 0,
-      content: "Smartcodes is a leading marketing agency known for delivering exceptional client solutions. Our program allows you to understand the nuances of account management in a dynamic environment. We believe in fostering innovation and collaboration to create impactful marketing strategies. Join us to learn the secrets of successful client engagement and project delivery.",
-      section: 1
+      "ID": 5,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 0,
+      "content": "Smartcodes is a leading marketing agency known for delivering exceptional client solutions. Our program allows you to understand the nuances of account management in a dynamic environment. We believe in fostering innovation and collaboration to create impactful marketing strategies. Join us to learn the secrets of successful client engagement and project delivery.",
+      "section": 1
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Complete the program at your own pace, anywhere.",
-      section: 2
+      "ID": 6,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Complete the program at your own pace, anywhere.",
+      "section": 2
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Receive a certificate of completion from Smartcodes to boost your resume.",
-      section: 2
+      "ID": 7,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Receive a certificate of completion from Smartcodes to boost your resume.",
+      "section": 2
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Gain practical experience to set you apart in the job market.",
-      section: 2
+      "ID": 8,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Gain practical experience to set you apart in the job market.",
+      "section": 2
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Evaluate if Smartcodes is the right fit for you.",
-      section: 2
+      "ID": 9,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Evaluate if Smartcodes is the right fit for you.",
+      "section": 2
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Complete tasks with guidance from pre-recorded videos and sample answers by our experts.",
-      section: 3
+      "ID": 10,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Complete tasks with guidance from pre-recorded videos and sample answers by our experts.",
+      "section": 3
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Earn a certificate to showcase your new skills in account management.",
-      section: 3
+      "ID": 11,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Earn a certificate to showcase your new skills in account management.",
+      "section": 3
     },
     {
-      companyID: 1,
-      company: "Smartcodes",
-      bulletPoint: 1,
-      content: "Impress potential employers with your enhanced skills and insights.",
-      section: 3
+      "ID": 12,
+      "companyID": 1,
+      "company": "Smartcodes",
+      "bulletPoint": 1,
+      "content": "Impress potential employers with your enhanced skills and insights.",
+      "section": 3
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 0,
-      content: "Experience real-world software development challenges at Smartnology. Enhance your technical skills and boost your confidence through practical coding tasks.",
-      section: 1
+      "ID": 13,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 0,
+      "content": "Experience real-world software development challenges at Smartnology. Enhance your technical skills and boost your confidence through practical coding tasks.",
+      "section": 1
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "Self-paced 5-6 hours",
-      section: 1
+      "ID": 14,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "Self-paced 5-6 hours",
+      "section": 1
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "No grades",
-      section: 1
+      "ID": 15,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "No grades",
+      "section": 1
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "No assessments",
-      section: 1
+      "ID": 16,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "No assessments",
+      "section": 1
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 0,
-      content: "Smartnology specializes in cutting-edge technology solutions, offering web and mobile application development services. This program introduces you to the essentials of software development, empowering you with skills to thrive in a tech-driven world.",
-      section: 1
+      "ID": 17,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 0,
+      "content": "Smartnology specializes in cutting-edge technology solutions, offering web and mobile application development services. This program introduces you to the essentials of software development, empowering you with skills to thrive in a tech-driven world.",
+      "section": 1
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "A flexible program you can complete at your own pace.",
-      section: 2
+      "ID": 18,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "A flexible program you can complete at your own pace.",
+      "section": 2
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "A certificate of completion from Smartnology to add to your portfolio.",
-      section: 2
+      "ID": 19,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "A certificate of completion from Smartnology to add to your portfolio.",
+      "section": 2
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "Valuable skills to stand out in the tech industry.",
-      section: 2
+      "ID": 20,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "Valuable skills to stand out in the tech industry.",
+      "section": 2
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "Insight into Smartnology’s innovative work environment.",
-      section: 2
+      "ID": 21,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "Insight into Smartnology’s innovative work environment.",
+      "section": 2
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "Follow step-by-step tutorials and examples provided by our software experts.",
-      section: 3
+      "ID": 22,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "Follow step-by-step tutorials and examples provided by our software experts.",
+      "section": 3
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "Earn a certificate to demonstrate your proficiency in software development.",
-      section: 3
+      "ID": 23,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "Earn a certificate to demonstrate your proficiency in software development.",
+      "section": 3
     },
     {
-      companyID: 2,
-      company: "Smartnology",
-      bulletPoint: 1,
-      content: "Enhance your job applications with newfound technical skills.",
-      section: 3
+      "ID": 24,
+      "companyID": 2,
+      "company": "Smartnology",
+      "bulletPoint": 1,
+      "content": "Enhance your job applications with newfound technical skills.",
+      "section": 3
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 0,
-      content: "Gain insight into the product management process at Smartfoundry. Practice essential skills through engaging tasks and prepare yourself for a successful career in product management.",
-      section: 1
+      "ID": 25,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 0,
+      "content": "Gain insight into the product management process at Smartfoundry. Practice essential skills through engaging tasks and prepare yourself for a successful career in product management.",
+      "section": 1
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "Self-paced 4-5 hours",
-      section: 1
+      "ID": 26,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "Self-paced 4-5 hours",
+      "section": 1
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "No grades",
-      section: 1
+      "ID": 27,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "No grades",
+      "section": 1
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "No assessments",
-      section: 1
+      "ID": 28,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "No assessments",
+      "section": 1
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 0,
-      content: "Smartfoundry is a leader in product innovation, focusing on developing and managing successful products. This program gives you a glimpse into the strategic and analytical skills required to excel in product management.",
-      section: 1
+      "ID": 29,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 0,
+      "content": "Smartfoundry is a leader in product innovation, focusing on developing and managing successful products. This program gives you a glimpse into the strategic and analytical skills required to excel in product management.",
+      "section": 1
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "A flexible, self-paced program you can complete anywhere.",
-      section: 2
+      "ID": 30,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "A flexible, self-paced program you can complete anywhere.",
+      "section": 2
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "A certificate of completion from Smartfoundry to enhance your resume.",
-      section: 2
+      "ID": 31,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "A certificate of completion from Smartfoundry to enhance your resume.",
+      "section": 2
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "Practical experience to help you stand out in the job market.",
-      section: 2
+      "ID": 32,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "Practical experience to help you stand out in the job market.",
+      "section": 2
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "An inside look at Smartfoundry’s product development approach.",
-      section: 2
+      "ID": 33,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "An inside look at Smartfoundry’s product development approach.",
+      "section": 2
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "Follow guided tasks with examples and tips from our product management team.",
-      section: 3
+      "ID": 34,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "Follow guided tasks with examples and tips from our product management team.",
+      "section": 3
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "Earn a certificate to showcase your product management expertise.",
-      section: 3
+      "ID": 35,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "Earn a certificate to showcase your product management expertise.",
+      "section": 3
     },
     {
-      companyID: 3,
-      company: "Smartfoundry",
-      bulletPoint: 1,
-      content: "Stand out in interviews with your practical knowledge and skills.",
-      section: 3
+      "ID": 36,
+      "companyID": 3,
+      "company": "Smartfoundry",
+      "bulletPoint": 1,
+      "content": "Stand out in interviews with your practical knowledge and skills.",
+      "section": 3
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 0,
-      content: "Explore the world of content creation at Smartstudio. Practice essential skills and build your portfolio with hands-on tasks designed to enhance your creativity.",
-      section: 1
+      "ID": 37,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 0,
+      "content": "Explore the world of content creation at Smartstudio. Practice essential skills and build your portfolio with hands-on tasks designed to enhance your creativity.",
+      "section": 1
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "Self-paced 3-4 hours",
-      section: 1
+      "ID": 38,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "Self-paced 3-4 hours",
+      "section": 1
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "No grades",
-      section: 1
+      "ID": 39,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "No grades",
+      "section": 1
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "No assessments",
-      section: 1
+      "ID": 40,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "No assessments",
+      "section": 1
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 0,
-      content: "Smartstudio is at the forefront of visual content creation, offering photography, videography, and multimedia services. Our program gives you the tools to excel in creative content production.",
-      section: 1
+      "ID": 41,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 0,
+      "content": "Smartstudio is at the forefront of visual content creation, offering photography, videography, and multimedia services. Our program gives you the tools to excel in creative content production.",
+      "section": 1
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "A self-paced program you can complete on your own time.",
-      section: 2
+      "ID": 42,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "A self-paced program you can complete on your own time.",
+      "section": 2
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "A certificate of completion from Smartstudio to showcase your creative skills.",
-      section: 2
+      "ID": 43,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "A certificate of completion from Smartstudio to showcase your creative skills.",
+      "section": 2
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "Experience to set you apart in the creative industry.",
-      section: 2
+      "ID": 44,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "Experience to set you apart in the creative industry.",
+      "section": 2
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "Insight into Smartstudio’s innovative creative process.",
-      section: 2
+      "ID": 45,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "Insight into Smartstudio’s innovative creative process.",
+      "section": 2
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "Complete tasks with guidance from pre-recorded tutorials and examples.",
-      section: 3
+      "ID": 46,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "Complete tasks with guidance from pre-recorded tutorials and examples.",
+      "section": 3
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "Earn a certificate to demonstrate your content creation proficiency.",
-      section: 3
+      "ID": 47,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "Earn a certificate to demonstrate your content creation proficiency.",
+      "section": 3
     },
     {
-      companyID: 4,
-      company: "Smartstudio",
-      bulletPoint: 1,
-      content: "Enhance your job applications with impressive creative work.",
-      section: 3
+      "ID": 48,
+      "companyID": 4,
+      "company": "Smartstudio",
+      "bulletPoint": 1,
+      "content": "Enhance your job applications with impressive creative work.",
+      "section": 3
     }
   ];
+  
 
   await Promise.all(
     descriptions.map((description) => {
       return db.run(
-        "INSERT INTO descriptions (companyID, company, bulletPoint, content, section) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO descriptions (ID, companyID, company, bulletPoint, content, section) VALUES (?, ?, ?, ?, ?, ?)",
         [
+          description.ID,
           description.companyID,
           description.company,
           description.bulletPoint,
@@ -501,6 +552,8 @@ async function initializeDB() {
   // Insert data into the tasks table
   const tasks = [
     {
+      ID: 1,
+      name: "Smartcodes1",
       companyID: 1,
       company: "Smartcodes",
       title: "Task One: Client Engagement Strategy",
@@ -508,77 +561,99 @@ async function initializeDB() {
       length: "1-2 hours"
     },
     {
+      ID: 2,
       companyID: 1,
+      name: "Smartcodes2",
       company: "Smartcodes",
       title: "Task Two: Project Management Essentials",
       subtitle: "Discover the key components of managing projects within tight deadlines.",
       length: "1-2 hours"
     },
     {
+      ID: 3,
       companyID: 1,
+      name: "Smartcodes3",
       company: "Smartcodes",
       title: "Task Three: Reporting and Analytics",
       subtitle: "Understand how to leverage data to provide insights to clients.",
       length: "1 hour"
     },
     {
+      ID: 4,
       companyID: 2,
+      name: "Smartnology1",
       company: "Smartnology",
       title: "Task One: Introduction to Coding",
       subtitle: "Learn the basics of programming languages and coding structures.",
       length: "1-2 hours"
     },
     {
+      ID: 5,
       companyID: 2,
+      name: "Smartnology2",
       company: "Smartnology",
       title: "Task Two: Web Development Fundamentals",
       subtitle: "Explore the essentials of creating responsive websites.",
-      length: "1-2 hours"
+      length: "1-2 hours",
     },
     {
+      ID: 6,
       companyID: 2,
+      name: "Smartnology3",
       company: "Smartnology",
       title: "Task Three: Mobile Application Development",
       subtitle: "Understand the process of developing mobile applications.",
       length: "1-2 hours"
     },
     {
+      ID: 7,
       companyID: 3,
+      name: "Smartfoundry1",
       company: "Smartfoundry",
       title: "Task One: Product Strategy Development",
       subtitle: "Learn how to create and communicate a successful product strategy.",
       length: "1-2 hours"
     },
     {
+      ID: 8,
       companyID: 3,
+      name: "Smartfoundry2",
       company: "Smartfoundry",
       title: "Task Two: Roadmap Planning",
       subtitle: "Discover how to plan and prioritize product features effectively.",
       length: "1-2 hours"
     },
     {
+      ID: 9,
       companyID: 3,
+      name: "Smartfoundry3",
       company: "Smartfoundry",
       title: "Task Three: Product Launch Execution",
       subtitle: "Understand the steps involved in launching a new product.",
       length: "1-2 hours"
     },
     {
+      ID: 10,
       companyID: 4,
+      name: "Smartstudio1",
       company: "Smartstudio",
       title: "Task One: Photography Basics",
       subtitle: "Learn the fundamentals of capturing stunning images.",
       length: "1-2 hours"
     },
     {
+      ID: 11,
       companyID: 4,
+      name: "Smartstudio2",
       company: "Smartstudio",
       title: "Task Two: Videography Essentials",
       subtitle: "Explore the art of storytelling through video.",
       length: "1-2 hours"
     },
     {
+      ID: 12,
       companyID: 4,
+      name: "Smartstudio3",
       company: "Smartstudio",
       title: "Task Three: Multimedia Content Creation",
       subtitle: "Discover how to combine various media forms into cohesive content.",
@@ -589,9 +664,11 @@ async function initializeDB() {
   await Promise.all(
     tasks.map((task) => {
       return db.run(
-        "INSERT INTO tasks (companyID, company, title, subtitle, length) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO tasks (ID, companyID, name, company, title, subtitle, length) VALUES (?, ?, ?, ?, ?, ?, ?)",
         [
+          task.ID,
           task.companyID,
+          task.name,
           task.company,
           task.title,
           task.subtitle,

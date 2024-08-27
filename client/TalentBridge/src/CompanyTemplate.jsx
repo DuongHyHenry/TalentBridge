@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Header";
+import { Card } from "antd";
+import { Link } from "react-router-dom";
+
+
 import "./style.css";
 
 function CompanyTemplate() {
@@ -8,7 +12,6 @@ function CompanyTemplate() {
   const [data, setData] = useState({ descriptions: [] });
 
   useEffect(() => {
-
     fetch(`http://localhost:5000/companies/${companyName}`)
       .then((response) => response.json())
       .then((data) => {
@@ -18,59 +21,70 @@ function CompanyTemplate() {
       })
       .catch((error) => console.error("Error fetching company data:", error));
   }, [companyName]);
-  console.log("Company Name: ", companyName);
-  console.log("Company Name: ", data.name);
 
+  // Helper function to render descriptions
+  const renderDescriptions = (section) => {
+    return (
+      <>
+        {data.descriptions
+          .filter((desc) => desc.section === section)
+          .map((desc, index) => (
+            <div key={index}>
+              {desc.bulletPoint === 1 ? (
+                <ul>
+                  <li>{desc.content}</li>
+                </ul>
+              ) : (
+                <p>{desc.content}</p>
+              )}
+            </div>
+          ))}
+      </>
+    );
+  };
 
   return (
     <>
       <Header />
-      <div className="main-body">
+      <div className="company-body">
         <h1>{data.name}</h1>
         <img src={data.logo} alt={data.name} />
         <h2>{data.title}</h2>
         <h2>{data.subtitle}</h2>
-        
+
         <h3>Why Complete Our Simulation:</h3>
-        {Array.isArray(data.descriptions) && data.descriptions.length > 0 ? (
-          data.descriptions.map((desc, index) => (
-            <div key={index}>
-              <p>{desc.content}</p>
-            </div>
-          ))
-        ) : (
-          <p>No descriptions available.</p>
-        )}
+        {renderDescriptions(1)}
+
         <h3>What's in it for you?</h3>
-        {Array.isArray(data.descriptions) && data.descriptions.section == 2 ? (
-          data.descriptions.map((desc, index) => (
-            <div key={index}>
-              <p>{desc.content}</p>
-            </div>
-          ))
-        ) : (
-          <p>No descriptions available.</p>
-        )}
+        {renderDescriptions(2)}
+
         <h3>How it works:</h3>
-        {Array.isArray(data.descriptions) && data.descriptions.section == 3 ? (
-          data.descriptions.map((desc, index) => (
-            <div key={index}>
-              <p>{desc.content}</p>
-            </div>
-          ))
-        ) : (
-          <p>No descriptions available.</p>
-        )}
-        <h3>Tasks in this Program:</h3>
-        {Array.isArray(data.tasks) ? (
-          data.descriptions.map((desc, index) => (
-            <div key={index}>
-              <p>{desc.task}</p>
-            </div>
-          ))
-        ) : (
-          <p>No tasks available.</p>
-        )}
+        {renderDescriptions(3)}
+
+        <div className="task-container">
+
+
+          <h3>Tasks in this Program:</h3>
+          {Array.isArray(data.tasks) ? (
+            data.tasks.map((task, index) => (
+              <Link
+                to={`/Task/${task.name}`}
+                key={task.name}
+                className="task-link"
+              >
+                <Card className="task-card">
+                  <div key={index}>
+                    <h4>{task.title}</h4>
+                    <p>{task.subtitle}</p>
+                    <p>{task.length}</p>
+                  </div>
+                </Card>
+              </Link>
+            ))
+          ) : (
+            <p>No tasks available.</p>
+          )}
+        </div>
       </div>
       <footer>@2024 SmartLab. All Rights Reserved.</footer>
     </>

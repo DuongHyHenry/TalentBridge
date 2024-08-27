@@ -129,7 +129,7 @@ footer {
     padding: 16px;
     padding-top: 30px;
     padding-bottom: 30px;
-    background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
+    background: rgb(151, 117, 195);
 }
 
 .card-container {
@@ -157,7 +157,7 @@ footer {
     transition: transform 0.2s; 
     padding: 16px;
     box-sizing: border-box;
-    background-color: #ffffff;
+    background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
 }
 
 .card-imgtitle-container {
@@ -210,21 +210,28 @@ footer {
 
 .scroll-button-left  {
     left: 10px;
-    top: 100%;
+    top: 113%;
     width: 50px;
     position: absolute;
 }
 
 .scroll-button-right  {
     right: 10px;
-    top: 100%;
+    top: 113%;
     width: 50px;
     position: absolute;
 }
 
-.scroll-button:hover {
-    background-color: #5b4e8a; /* Darker shade on hover */
+.scroll-button-left:hover {
+    transform: scale(1.1);
+    cursor: pointer;
 }
+
+.scroll-button-right:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
 
 .login-container {
     display: flex;
@@ -255,21 +262,48 @@ footer {
     transform: scale(1.05);
 }
 
-.hexagon {
-    width: 300px;
-    height: 360px;
-    background-color: #645DA5;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex; /* Use flexbox to center the text */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    color: white; /* Text color */
-    font-size: 20px; /* Text size */
-  }
-
-  .content {
+.content {
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     gap: 20px;
+}
+
+.company-body {
+    margin: 0;
+    background: rgb(151, 117, 195);
+    font-family: 'Gilroy-Regular';
+    color: rgb(0, 0, 0);
+    padding-top: 120px;
+    padding-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.task-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.task-card {
+    width: auto;
+    max-width: 90%;
+    min-height: 300px; /* Set a minimum height if needed */
+    display: flex; /* Change to flex to stack content */
+    flex-direction: row; /* Set to row to align img-title and desc horizontally */
+    justify-content: flex-start; /* Align items at the start */
+    align-items: center; /* Center items vertically */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px; 
+    transition: transform 0.2s; 
+    padding: 16px;
+    box-sizing: border-box;
+    background: linear-gradient(0deg, #645DA5, rgb(95, 88, 158), #645DA5);
+}
+
+.task-card:hover {
+    transform: scale(1.05);
+    cursor: pointer;
 }

@@ -65,13 +65,14 @@ const Home = () => {
 
               </Link>
             ))}
+            <div className="scroll-button-left" onClick={scrollLeft}>
+              <img src={LeftArrow} alt="Scroll Right" />
+            </div>
+            <div className="scroll-button-right" onClick={scrollRight}>
+              <img src={RightArrow} alt="Scroll Right" />
+            </div>
           </div>
-          <div className="scroll-button-left" onClick={scrollLeft}>
-            <img src={LeftArrow} alt="Scroll Right" />
-          </div>
-          <div className="scroll-button-right" onClick={scrollRight}>
-            <img src={RightArrow} alt="Scroll Right" />
-          </div>
+          
         </div>
       
         

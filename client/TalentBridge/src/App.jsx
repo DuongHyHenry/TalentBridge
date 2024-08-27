@@ -5,6 +5,7 @@ import Login from './Login';
 import Username from './Username';
 import Logout from './Logout';
 import CompanyTemplate from './CompanyTemplate';
+import TaskTemplate from './TaskTemplate';
 import Profile from './Profile';
 import { AuthProvider } from './AuthContext';
 
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/Logout" element={<Logout />} />
           <Route path="/Profile" element={<Profile />} />
           <Route path="/Company/:companyName" element={<CompanyTemplate />} />
+          <Route path="/Task/:taskName" element={<TaskTemplate />} />
         </Routes>``
       </Router>
     </AuthProvider>

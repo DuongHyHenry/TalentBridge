@@ -277,9 +277,45 @@ app.get("/companies/:companyName", async (req, res) => {
       tasks
     };
 
+    console.log(companyData);
+
     res.json(companyData);
   } catch (error) {
     console.error("Error fetching company data and descriptions:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/tasks/:taskName", async (req, res) => {
+  const { taskName } = req.params;
+
+  try {
+    // Fetch company data
+    const task = await getTaskByName(taskName);
+
+    if (!task) {
+      return res.status(404).send("Task not found");
+    }
+
+    const descriptions = await getDescByTask(task.ID);
+
+    // Combine company data with descriptions
+    const taskData = {
+      ID: task.ID,
+      companyID: task.companyID,
+      name: task.name,
+      company: task.company,
+      title: task.title,
+      subtitle: task.subtitle,
+      length: task.length,
+      descriptions
+    };
+
+    console.log("Task:", taskData);
+
+    res.json(taskData);
+  } catch (error) {
+    console.error("Error fetching task data and descriptions:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -307,8 +343,8 @@ async function getCompanyByName(name) {
 
 async function getCompanyDescription(name) {
   try {
-    const description = await db.get(
-      "SELECT * FROM descriptions WHERE company = ?",
+    const description = await db.all(
+      "SELECT * FROM descriptions WHERE company = ? ORDER BY ID",
       name
     );
     return description;
@@ -319,13 +355,50 @@ async function getCompanyDescription(name) {
 
 async function getTasksByCompany(name) {
   try {
-    const tasks = await db.get(
-      "SELECT * FROM tasks WHERE company = ?",
+    const tasks = await db.all(
+      "SELECT * FROM tasks WHERE company = ? ORDER BY ID ASC",
       name
     );
     return tasks;
   } catch (error) {
     console.log("Failed to fetch company tasks by name: ", error);
+  }
+}
+
+async function getTaskByName(name) {
+  try {
+    const task = await db.get(
+      "SELECT * FROM tasks WHERE name = ?",
+      name
+    );
+    return task;
+  } catch (error) {
+    console.log("Failed to fetch task by name: ", error);
+  }
+}
+
+async function getCompanyByTask(name) {
+  try {
+    const task = await db.get(
+      "SELECT company FROM tasks WHERE name = ?",
+      name
+    );
+    return task;
+  } catch (error) {
+    console.log("Failed to fetch company by name: ", error);
+  }
+}
+
+async function getDescByTask(ID) {
+  try {
+    const taskDescriptions = await db.all(
+      "SELECT * FROM taskDescriptions WHERE taskID = ? ORDER BY ID ASC",
+      ID
+    );
+    console.log("Task Descriptions: ", taskDescriptions);
+    return taskDescriptions;
+  } catch (error) {
+    console.log("Failed to fetch task descriptions by task: ", error);
   }
 }
 
